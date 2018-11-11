@@ -2,7 +2,7 @@ language: python
 sudo: required
 dist: xenial
 python: '3.7'
-script: './build.py'
+script: 'python build.py'
 deploy:
   provider: releases
   api_key: $GITHUB_TOKEN
