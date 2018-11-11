@@ -31,6 +31,13 @@ for svg in Path('.').glob('photon-icons/icons/desktop/*.svg'):
             element.set('fill-opacity', element.get('fill-opacity').replace('context-fill-opacity', ''))
     defs.append(symbol)
 
+comment = ET.Comment('''
+    This Source Code Form is subject to the terms of the Mozilla Public
+    License, v. 2.0. If a copy of the MPL was not distributed with this
+    file, You can obtain one at http://mozilla.org/MPL/2.0/.
+''')
+sprite.insert(0, comment) 
+
 Path('dist').mkdir(exist_ok=True)
 ET.ElementTree(element=sprite).write('dist/photon-icons.svg',
                                      encoding='utf-8', xml_declaration=True)
