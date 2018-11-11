@@ -1,0 +1,3 @@
+[submodule "photon-icons"]
+	path = photon-icons
+	url = https://github.com/FirefoxUX/photon-icons.git
