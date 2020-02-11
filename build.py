@@ -7,14 +7,12 @@ ET.register_namespace('', 'http://www.w3.org/2000/svg')
 sprite = ET.XML('<svg><defs/></svg>')
 defs = sprite.find('defs')
 
-sizes = defaultdict(int)
+ids = {}
 for svg in Path('.').glob('photon-icons/icons/desktop/*.svg'):
     id = re.sub(r'-\d+', '', svg.stem)
-    size_match = re.search(r'-(\d+)', svg.stem)
-    size = int(size_match[1]) if size_match else 0
-    if sizes[id] > size:
+    if id in ids:
         continue
-    sizes[id] = size
+    ids[id] = True
     
     symbol = ET.parse(svg).getroot()
     symbol.tag = 'symbol'
@@ -22,13 +20,24 @@ for svg in Path('.').glob('photon-icons/icons/desktop/*.svg'):
     del symbol.attrib['height']
     del symbol.attrib['width']
     
+    has_context_fill = False
     for element in symbol.findall('*') + [symbol]:
-        if element.get('fill') is not None:
-            element.set('fill', element.get('fill').replace('context-fill', 'currentColor'))
-        if element.get('stroke') is not None:
-            element.set('stroke', element.get('stroke').replace('context-fill', 'currentColor'))
+        for attr in ['fill', 'stroke']:
+            if element.get(attr) is not None:
+                if 'context-fill' in element.get(attr):
+                    has_context_fill = True
+                element.set(attr, element.get(attr).replace('context-fill', 'currentColor'))
         if element.get('fill-opacity') is not None:
             element.set('fill-opacity', element.get('fill-opacity').replace('context-fill-opacity', ''))
+    
+    if not has_context_fill:
+        for element in symbol.findall('*'):
+            try:
+                del element.attrib['fill']
+            except KeyError:
+                pass
+        symbol.set('fill', 'currentColor')
+
     defs.append(symbol)
 
 comment = ET.Comment('''
